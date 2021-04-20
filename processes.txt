@@ -1,0 +1,6 @@
+Structure: id burst_time priority io_time clock_time
+
+A 2 1 2 2
+B 5 2 5 3
+C 9 1 4 2
+D 3 3 6 4

@@ -41,23 +41,36 @@
         </div>
       </div>
       <div class="row pb-3">
+        <div class="col d-flex justify-content-center">
+          <input
+            type="file"
+            accept="text/plain"
+            class="custom-file-input"
+            style="border: 1px solid black"
+            onchange="onFileChange(event)"
+          />
+        </div>
+      </div>
+      <div class="row pb-3">
         <div class="col d-flex align-items-center justify-content-center">
           <button
             type="button"
             class="btn btn-primary"
             onclick="prevClock()"
             id="prev-btn"
+            disabled
             style="margin-right: 16px"
           >
             &larr;
           </button>
-          <span id="clock-text"></span>
+          <span id="clock-text">-</span>
           <button
             type="button"
             class="btn btn-primary"
             onclick="nextClock()"
             id="next-btn"
             style="margin-left: 16px"
+            disabled
           >
             &rarr;
           </button>
@@ -74,13 +87,7 @@
                 <th scope="col">Clock Time</th>
               </tr>
             </thead>
-            <tbody id="fifo-queue">
-              <tr>
-                <th>1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-              </tr>
-            </tbody>
+            <tbody id="fifo-queue"></tbody>
           </table>
         </div>
         <div class="col">

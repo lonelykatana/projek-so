@@ -1,6 +1,8 @@
 const log = [];
 const queueLog = [];
 let currentClockTime = 0;
+const input = [];
+let clockCounter = 0;
 
 function populateQueues(input) {
   const fIFOQueue = [];
@@ -208,12 +210,6 @@ function arrangeNPSJFQueue(queue) {
 function main() {
   const QUANTUM_TIME = 5;
 
-  const input = [
-    ["A", 2, 1, 2, 2],
-    ["B", 5, 2, 5, 3],
-    ["C", 9, 1, 4, 3],
-    ["D", 3, 3, 6, 4],
-  ];
   let { fIFOQueue, rRQueue, nPSJFQueue } = populateQueues(input);
 
   if (fIFOQueue.length > 50) {
@@ -329,22 +325,49 @@ function main() {
 
     currentClockTime++;
   }
-
-  console.log(input);
-  queueLog.forEach((element) => console.log(element));
 }
 
-main();
+function onFileChange(event) {
+  const selectedFile = event.target.files[0];
+  const reader = new FileReader();
 
-currentClockTime--;
-let clockCounter = 0;
-$(document).ready(() => {
-  $("#clock-text").text(`Clock ${clockCounter}`);
-  $("#prev-btn").prop("disabled", true);
+  reader.onload = function (event) {
+    input.splice(0, input.length);
+    log.splice(0, log.length);
+    queueLog.splice(0, queueLog.length);
+    currentClockTime = 0;
+    clockCounter = 0;
 
-  renderQueues();
-  renderLog();
-});
+    const result = event.target.result;
+
+    result.split("\n").forEach((line) => {
+      const chars = line.split(" ");
+
+      if (chars.length === 5) {
+        input.push(
+          chars.map((char, index) => (index === 0 ? char : parseInt(char)))
+        );
+      }
+    });
+
+    main();
+
+    $("#clock-text").text(`Clock ${clockCounter}`);
+
+    $("#prev-btn").prop("disabled", true);
+    if (currentClockTime === 0) {
+      $("#next-btn").prop("disabled", true);
+    } else {
+      $("#next-btn").prop("disabled", false);
+      currentClockTime--;
+    }
+
+    renderQueues();
+    renderLog();
+  };
+
+  reader.readAsText(selectedFile);
+}
 
 function nextClock() {
   $("#clock-text").text(`Clock ${++clockCounter}`);
