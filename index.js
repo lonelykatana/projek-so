@@ -99,12 +99,16 @@ function arrangeRRQueue(queue, quantumTime) {
     return process1.clockTime - process2.clockTime;
   });
 
+  let indexCounter = 0;
+
   while (tempQueue.length !== 0) {
     rRQueue = rRQueue.concat(
       tempQueue.map((process) => {
-        if (process.runningTime <= quantumTime) return process;
+        if (process.runningTime <= quantumTime) {
+          return { ...process, index: 0 };
+        }
 
-        return { ...process, runningTime: quantumTime };
+        return { ...process, runningTime: quantumTime, index: indexCounter++ };
       })
     );
     tempQueue = tempQueue.filter(
@@ -168,6 +172,16 @@ function main() {
     [4, 3, 3, 6, 4],
   ];
   let { fIFOQueue, rRQueue, nPSJFQueue } = populateQueues(input);
+
+  if (fIFOQueue.length > 50) {
+    const tempQueue = [...fIFOQueue].sort(function (process1, process2) {
+      return process2.runningTime - process1.runningTime;
+    });
+
+    fIFOQueue = tempQueue.slice(0, 50);
+    rRQueue = rRQueue.concat(tempQueue.slice(50));
+  }
+
   fIFOQueue = arrangeFIFOQueue(fIFOQueue);
   rRQueue = arrangeRRQueue(rRQueue, QUANTUM_TIME);
   nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
@@ -178,8 +192,66 @@ function main() {
     nPSJFQueue.length !== 0
   ) {
     fIFOQueue = processFIFOQueue(fIFOQueue, currentClockTime);
+
+    if (fIFOQueue.length > 0) {
+      const fIFOQueueCurrentProcess = fIFOQueue[0];
+      if (currentClockTime - fIFOQueueCurrentProcess.startTime === 20) {
+        nPSJFQueue.push({
+          ...fIFOQueueCurrentProcess,
+          runningTime: fIFOQueueCurrentProcess.runningTime - 20,
+          clockTime: currentClockTime,
+        });
+        fIFOQueue.shift();
+        fIFOQueue = arrangeFIFOQueue(fIFOQueue);
+        nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+      }
+    }
+
     rRQueue = processRRQueue(rRQueue, currentClockTime);
+
+    if (rRQueue.length > 0) {
+      const rRQueueCurrentProcess = rRQueue[0];
+      if (rRQueueCurrentProcess.index === 3) {
+        const remainingRunningTime = rRQueue
+          .filter((process) => process.id === rRQueueCurrentProcess.id)
+          .reduce(
+            (accumulator, currentValue) =>
+              accumulator + currentValue.runningTime,
+            0
+          );
+
+        nPSJFQueue.push({
+          ...rRQueueCurrentProcess,
+          runningTime: remainingRunningTime,
+          clockTime: currentClockTime,
+        });
+        rRQueue = rRQueue.filter(
+          (process) => process.id !== rRQueueCurrentProcess.id
+        );
+        nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+        rRQueue = arrangeRRQueue(rRQueue);
+      }
+    }
+
     nPSJFQueue = processNPSJFQueue(nPSJFQueue, currentClockTime);
+
+    if (
+      currentClockTime === 40 &&
+      nPSJFQueue.length > 0 &&
+      nPSJFQueueCurrentProcess.waitingTime >= 40
+    ) {
+      const nPSJFQueueCurrentProcess = nPSJFQueue[0];
+      if (nPSJFQueueCurrentProcess.waitingTime >= 40) {
+        fIFOQueue.push({
+          ...nPSJFQueueCurrentProcess,
+          clockTime: currentClockTime,
+        });
+        nPSJFQueue.shift();
+        fIFOQueue = arrangeFIFOQueue(fIFOQueue);
+        nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+      }
+    }
+
     currentClockTime++;
   }
 
