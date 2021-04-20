@@ -36,6 +36,9 @@ function processFIFOQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
+    console.log(`Selesai memproses proses dengan id ${processedProcess.id}`);
+  } else {
+    console.log(`Sedang memproses proses dengan id ${processedProcess.id}`);
   }
 
   return processedQueue;
@@ -49,6 +52,13 @@ function processRRQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
+    console.log(
+      `Selesai memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`
+    );
+  } else {
+    console.log(
+      `Sedang memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`
+    );
   }
 
   return processedQueue;
@@ -62,6 +72,9 @@ function processNPSJFQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
+    console.log(`Selesai memproses proses dengan id ${processedProcess.id}`);
+  } else {
+    console.log(`Sedang memproses proses dengan id ${processedProcess.id}`);
   }
 
   return processedQueue;
@@ -99,16 +112,24 @@ function arrangeRRQueue(queue, quantumTime) {
     return process1.clockTime - process2.clockTime;
   });
 
-  let indexCounter = 0;
-
   while (tempQueue.length !== 0) {
     rRQueue = rRQueue.concat(
       tempQueue.map((process) => {
-        if (process.runningTime <= quantumTime) {
-          return { ...process, index: 0 };
-        }
+        const lastIndex =
+          rRQueue.reverse().find((element) => element.id === process.id) !==
+          undefined
+            ? rRQueue.reverse().find((element) => element.id === process.id)
+                .index
+            : -1;
 
-        return { ...process, runningTime: quantumTime, index: indexCounter++ };
+        return {
+          ...process,
+          runningTime:
+            process.runningTime <= quantumTime
+              ? process.runningTime
+              : quantumTime,
+          index: lastIndex + 1,
+        };
       })
     );
     tempQueue = tempQueue.filter(
@@ -166,10 +187,10 @@ function main() {
 
   let currentClockTime = 0;
   const input = [
-    [1, 2, 1, 2, 2],
-    [2, 5, 2, 5, 3],
-    [3, 9, 1, 4, 3],
-    [4, 3, 3, 6, 4],
+    ["A", 2, 1, 2, 2],
+    ["B", 5, 2, 5, 3],
+    ["C", 9, 1, 4, 3],
+    ["D", 3, 3, 6, 4],
   ];
   let { fIFOQueue, rRQueue, nPSJFQueue } = populateQueues(input);
 
@@ -179,12 +200,21 @@ function main() {
     });
 
     fIFOQueue = tempQueue.slice(0, 50);
-    rRQueue = rRQueue.concat(tempQueue.slice(50));
+    rRQueue = rRQueue.concat(
+      tempQueue.slice(50).map((process) => {
+        console.log(
+          `Proses dengan id ${process.id} didemosikan ke Qb karena Qa penuh`
+        );
+        return process;
+      })
+    );
   }
 
   fIFOQueue = arrangeFIFOQueue(fIFOQueue);
   rRQueue = arrangeRRQueue(rRQueue, QUANTUM_TIME);
   nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+
+  console.log(rRQueue);
 
   while (
     fIFOQueue.length !== 0 ||
@@ -204,6 +234,10 @@ function main() {
         fIFOQueue.shift();
         fIFOQueue = arrangeFIFOQueue(fIFOQueue);
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+
+        console.log(
+          `Proses dengan id ${fIFOQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan CPU selama 20 clock`
+        );
       }
     }
 
@@ -226,10 +260,16 @@ function main() {
           clockTime: currentClockTime,
         });
         rRQueue = rRQueue.filter(
-          (process) => process.id !== rRQueueCurrentProcess.id
+          (process) =>
+            process.id !== rRQueueCurrentProcess.id &&
+            rRQueueCurrentProcess.index >= 3
         );
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
         rRQueue = arrangeRRQueue(rRQueue);
+
+        console.log(
+          `Proses dengan id ${rRQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan siklus RR selama 3 kali`
+        );
       }
     }
 
@@ -249,6 +289,10 @@ function main() {
         nPSJFQueue.shift();
         fIFOQueue = arrangeFIFOQueue(fIFOQueue);
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
+
+        console.log(
+          `Proses dengan id ${nPSJFQueueCurrentProcess.id} dipromosikan ke Qa karena telah menunggu selama 40 clock`
+        );
       }
     }
 
