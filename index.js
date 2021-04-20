@@ -1,5 +1,6 @@
 const log = [];
 const queueLog = [];
+let currentClockTime = 0;
 
 function populateQueues(input) {
   const fIFOQueue = [];
@@ -41,12 +42,12 @@ function processFIFOQueue(queue, currentClockTime) {
     processedQueue.shift();
     log.push({
       clockTime: currentClockTime,
-      message: `Selesai memproses proses dengan id ${processedProcess.id}`,
+      message: `Selesai memproses proses ${processedProcess.id}`,
     });
-  } else {
+  } else if (processedProcess.startTime < currentClockTime) {
     log.push({
       clockTime: currentClockTime,
-      message: `Sedang memproses proses dengan id ${processedProcess.id}`,
+      message: `Sedang memproses proses ${processedProcess.id}`,
     });
   }
 
@@ -63,12 +64,12 @@ function processRRQueue(queue, currentClockTime) {
     processedQueue.shift();
     log.push({
       clockTime: currentClockTime,
-      message: `Selesai memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`,
+      message: `Selesai memproses proses ${processedProcess.id} dengan indeks ${processedProcess.index}`,
     });
-  } else {
+  } else if (processedProcess.startTime < currentClockTime) {
     log.push({
       clockTime: currentClockTime,
-      message: `Sedang memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`,
+      message: `Sedang memproses proses ${processedProcess.id} dengan indeks ${processedProcess.index}`,
     });
   }
 
@@ -85,12 +86,12 @@ function processNPSJFQueue(queue, currentClockTime) {
     processedQueue.shift();
     log.push({
       clockTime: currentClockTime,
-      message: `Selesai memproses proses dengan id ${processedProcess.id}`,
+      message: `Selesai memproses proses ${processedProcess.id}`,
     });
-  } else {
+  } else if (processedProcess.startTime < currentClockTime) {
     log.push({
       clockTime: currentClockTime,
-      message: `Sedang memproses proses dengan id ${processedProcess.id}`,
+      message: `Sedang memproses proses ${processedProcess.id}`,
     });
   }
 
@@ -168,8 +169,13 @@ function arrangeRRQueue(queue, quantumTime) {
       );
     }
     process.endTime = process.startTime + process.runningTime;
-    // process.waitingTime = process.startTime - process.clockTime;
-    // process.turnAroundTime = process.waitingTime + process.runningTime;
+    // process.waitingTime = process.startTime - process.clockTime; (cari selisih antara tiap process index + waiting time mula2)
+    // process.turnAroundTime = process.waitingTime + process.runningTime; (endtime - clocktime dri tiap process id)
+  });
+
+  rRQueue.forEach((process, index) => {
+    // process.waitingTime = process.startTime - process.clockTime; (cari selisih antara tiap process index + waiting time mula2)
+    // process.turnAroundTime = process.waitingTime + process.runningTime; (endtime - clocktime dri tiap process id)
   });
 
   return rRQueue;
@@ -202,7 +208,6 @@ function arrangeNPSJFQueue(queue) {
 function main() {
   const QUANTUM_TIME = 5;
 
-  let currentClockTime = 0;
   const input = [
     ["A", 2, 1, 2, 2],
     ["B", 5, 2, 5, 3],
@@ -221,7 +226,7 @@ function main() {
       tempQueue.slice(50).map((process) => {
         log.push({
           clockTime: currentClockTime,
-          message: `Proses dengan id ${process.id} didemosikan ke Qb karena Qa penuh`,
+          message: `Proses ${process.id} didemosikan ke Qb karena Qa penuh`,
         });
         return process;
       })
@@ -253,7 +258,7 @@ function main() {
 
         log.push({
           clockTime: currentClockTime,
-          message: `Proses dengan id ${fIFOQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan CPU selama 20 clock`,
+          message: `Proses ${fIFOQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan CPU selama 20 clock`,
         });
       }
     }
@@ -286,7 +291,7 @@ function main() {
 
         log.push({
           clockTime: currentClockTime,
-          message: `Proses dengan id ${rRQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan siklus RR selama 3 kali`,
+          message: `Proses ${rRQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan siklus RR selama 3 kali`,
         });
       }
     }
@@ -310,7 +315,7 @@ function main() {
 
         log.push({
           clockTime: currentClockTime,
-          message: `Proses dengan id ${nPSJFQueueCurrentProcess.id} dipromosikan ke Qa karena telah menunggu selama 40 clock`,
+          message: `Proses ${nPSJFQueueCurrentProcess.id} dipromosikan ke Qa karena telah menunggu selama 40 clock`,
         });
       }
     }
@@ -327,9 +332,100 @@ function main() {
 
   console.log(input);
   queueLog.forEach((element) => console.log(element));
-  log.forEach((element) =>
-    console.log(`${element.message} (${element.clockTime})`)
-  );
 }
 
 main();
+
+currentClockTime--;
+let clockCounter = 0;
+$(document).ready(() => {
+  $("#clock-text").text(`Clock ${clockCounter}`);
+  $("#prev-btn").prop("disabled", true);
+
+  renderQueues();
+  renderLog();
+});
+
+function nextClock() {
+  $("#clock-text").text(`Clock ${++clockCounter}`);
+
+  if (clockCounter === currentClockTime) $("#next-btn").prop("disabled", true);
+
+  $("#prev-btn").prop("disabled", false);
+
+  renderQueues();
+  renderLog();
+}
+
+function prevClock() {
+  $("#clock-text").text(`Clock ${--clockCounter}`);
+
+  if (clockCounter === 0) {
+    $("#prev-btn").prop("disabled", true);
+  }
+
+  $("#next-btn").prop("disabled", false);
+
+  renderQueues();
+  renderLog();
+}
+
+function renderQueues() {
+  $("#fifo-queue").empty();
+  $("#rr-queue").empty();
+  $("#npsjf-queue").empty();
+
+  queueLog
+    .find((element) => element.clockTime === clockCounter)
+    .fIFOQueue.forEach((process) => {
+      let rowStructure =
+        process.startTime < clockCounter
+          ? "<tr class='table-success'>"
+          : "<tr>";
+      rowStructure += `<th class='text-center'>${process.id}</th>`;
+      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+      rowStructure += "</tr>";
+      $("#fifo-queue").append(rowStructure);
+    });
+
+  queueLog
+    .find((element) => element.clockTime === clockCounter)
+    .rRQueue.forEach((process) => {
+      let rowStructure =
+        process.startTime < clockCounter
+          ? "<tr class='table-success'>"
+          : "<tr>";
+      rowStructure += `<th class='text-center'>${process.id}</th>`;
+      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+      rowStructure += `<td class='text-center'>${process.index}</td>`;
+      rowStructure += "</tr>";
+      $("#rr-queue").append(rowStructure);
+    });
+
+  queueLog
+    .find((element) => element.clockTime === clockCounter)
+    .nPSJFQueue.forEach((process) => {
+      let rowStructure =
+        process.startTime < clockCounter
+          ? "<tr class='table-success'>"
+          : "<tr>";
+      rowStructure += `<th class='text-center'>${process.id}</th>`;
+      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+      rowStructure += "</tr>";
+      $("#npsjf-queue").append(rowStructure);
+    });
+}
+
+function renderLog() {
+  $("#log").empty();
+  log
+    .filter((element) => element.clockTime === clockCounter)
+    .forEach((element) =>
+      $("#log").append(
+        $(`<li class='list-group-item'></li>`).text(element.message)
+      )
+    );
+}

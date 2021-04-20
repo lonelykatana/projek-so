@@ -4,8 +4,117 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+      crossorigin="anonymous"
+    />
     <script src="./index.js"></script>
-    <title>Document</title>
+    <title>Projek SO</title>
   </head>
-  <body></body>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <h1 class="text-center">Sistem Operasi Penjadwalan</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p class="text-center">
+            Anggota Kelompok:
+            <br />
+            Randy Heksadesianto (181401002)
+            <br />
+            Gessel Leon Bremana Sitepu (181401047)
+            <br />
+            Rubenhard M H Lumbantobing (181401065)
+            <br />
+            Erick Mutiha Nauli Gultom (181401128)
+          </p>
+        </div>
+      </div>
+      <div class="row pb-3">
+        <div class="col d-flex align-items-center justify-content-center">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="prevClock()"
+            id="prev-btn"
+            style="margin-right: 16px"
+          >
+            &larr;
+          </button>
+          <span id="clock-text"></span>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="nextClock()"
+            id="next-btn"
+            style="margin-left: 16px"
+          >
+            &rarr;
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <h3 class="text-center">FIFO</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Running Time</th>
+                <th scope="col">Clock Time</th>
+              </tr>
+            </thead>
+            <tbody id="fifo-queue">
+              <tr>
+                <th>1</th>
+                <td>Mark</td>
+                <td>Otto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col">
+          <h3 class="text-center">Round Robin (RR)</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Running Time</th>
+                <th scope="col">Clock Time</th>
+                <th scope="col">Indeks</th>
+              </tr>
+            </thead>
+            <tbody id="rr-queue"></tbody>
+          </table>
+        </div>
+        <div class="col">
+          <h3 class="text-center">Non-Preemtive SJF</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Running Time</th>
+                <th scope="col">Clock Time</th>
+              </tr>
+            </thead>
+            <tbody id="npsjf-queue"></tbody>
+          </table>
+        </div>
+        <div class="col">
+          <h3 class="text-center">Log</h3>
+          <ul class="list-group" id="log"></ul>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
