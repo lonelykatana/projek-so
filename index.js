@@ -1,3 +1,6 @@
+const log = [];
+const queueLog = [];
+
 function populateQueues(input) {
   const fIFOQueue = [];
   const rRQueue = [];
@@ -36,9 +39,15 @@ function processFIFOQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
-    console.log(`Selesai memproses proses dengan id ${processedProcess.id}`);
+    log.push({
+      clockTime: currentClockTime,
+      message: `Selesai memproses proses dengan id ${processedProcess.id}`,
+    });
   } else {
-    console.log(`Sedang memproses proses dengan id ${processedProcess.id}`);
+    log.push({
+      clockTime: currentClockTime,
+      message: `Sedang memproses proses dengan id ${processedProcess.id}`,
+    });
   }
 
   return processedQueue;
@@ -52,13 +61,15 @@ function processRRQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
-    console.log(
-      `Selesai memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`
-    );
+    log.push({
+      clockTime: currentClockTime,
+      message: `Selesai memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`,
+    });
   } else {
-    console.log(
-      `Sedang memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`
-    );
+    log.push({
+      clockTime: currentClockTime,
+      message: `Sedang memproses proses dengan id ${processedProcess.id} ke ${processedProcess.index}`,
+    });
   }
 
   return processedQueue;
@@ -72,9 +83,15 @@ function processNPSJFQueue(queue, currentClockTime) {
 
   if (processedProcess.endTime === currentClockTime) {
     processedQueue.shift();
-    console.log(`Selesai memproses proses dengan id ${processedProcess.id}`);
+    log.push({
+      clockTime: currentClockTime,
+      message: `Selesai memproses proses dengan id ${processedProcess.id}`,
+    });
   } else {
-    console.log(`Sedang memproses proses dengan id ${processedProcess.id}`);
+    log.push({
+      clockTime: currentClockTime,
+      message: `Sedang memproses proses dengan id ${processedProcess.id}`,
+    });
   }
 
   return processedQueue;
@@ -202,9 +219,10 @@ function main() {
     fIFOQueue = tempQueue.slice(0, 50);
     rRQueue = rRQueue.concat(
       tempQueue.slice(50).map((process) => {
-        console.log(
-          `Proses dengan id ${process.id} didemosikan ke Qb karena Qa penuh`
-        );
+        log.push({
+          clockTime: currentClockTime,
+          message: `Proses dengan id ${process.id} didemosikan ke Qb karena Qa penuh`,
+        });
         return process;
       })
     );
@@ -213,8 +231,6 @@ function main() {
   fIFOQueue = arrangeFIFOQueue(fIFOQueue);
   rRQueue = arrangeRRQueue(rRQueue, QUANTUM_TIME);
   nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
-
-  console.log(rRQueue);
 
   while (
     fIFOQueue.length !== 0 ||
@@ -235,9 +251,10 @@ function main() {
         fIFOQueue = arrangeFIFOQueue(fIFOQueue);
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
 
-        console.log(
-          `Proses dengan id ${fIFOQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan CPU selama 20 clock`
-        );
+        log.push({
+          clockTime: currentClockTime,
+          message: `Proses dengan id ${fIFOQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan CPU selama 20 clock`,
+        });
       }
     }
 
@@ -267,9 +284,10 @@ function main() {
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
         rRQueue = arrangeRRQueue(rRQueue);
 
-        console.log(
-          `Proses dengan id ${rRQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan siklus RR selama 3 kali`
-        );
+        log.push({
+          clockTime: currentClockTime,
+          message: `Proses dengan id ${rRQueueCurrentProcess.id} didemosikan ke Qc karena telah menggunakan siklus RR selama 3 kali`,
+        });
       }
     }
 
@@ -290,19 +308,28 @@ function main() {
         fIFOQueue = arrangeFIFOQueue(fIFOQueue);
         nPSJFQueue = arrangeNPSJFQueue(nPSJFQueue);
 
-        console.log(
-          `Proses dengan id ${nPSJFQueueCurrentProcess.id} dipromosikan ke Qa karena telah menunggu selama 40 clock`
-        );
+        log.push({
+          clockTime: currentClockTime,
+          message: `Proses dengan id ${nPSJFQueueCurrentProcess.id} dipromosikan ke Qa karena telah menunggu selama 40 clock`,
+        });
       }
     }
+
+    queueLog.push({
+      clockTime: currentClockTime,
+      fIFOQueue,
+      rRQueue,
+      nPSJFQueue,
+    });
 
     currentClockTime++;
   }
 
   console.log(input);
-  console.log(fIFOQueue);
-  console.log(rRQueue);
-  console.log(nPSJFQueue);
+  queueLog.forEach((element) => console.log(element));
+  log.forEach((element) =>
+    console.log(`${element.message} (${element.clockTime})`)
+  );
 }
 
 main();
