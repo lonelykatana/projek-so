@@ -209,7 +209,7 @@ const main = (input) => {
             };
 
             newRRProcess.startTime = Math.max(
-              rRQueue[rRQueue.length - 1].endTime+1,
+              rRQueue[rRQueue.length - 1].endTime + 1,
               newRRProcess.clockTime
             );
 
@@ -244,6 +244,24 @@ const main = (input) => {
       fIFOQueue,
       rRQueue,
       nPSJFQueue,
+      fIFOAwt:
+        fIFOQueue.reduce((sum, process) => sum + process.waitingTime, 0) /
+        fIFOQueue.length,
+      rRAwt:
+        rRQueue.reduce((sum, process) => sum + process.waitingTime, 0) /
+        [...new Set(rRQueue.map((process) => process.id))].length,
+      nPSJFAwt:
+        nPSJFQueue.reduce((sum, process) => sum + process.waitingTime, 0) /
+        nPSJFQueue.length,
+      fIFOAtt:
+        fIFOQueue.reduce((sum, process) => sum + process.turnAroundTime, 0) /
+        fIFOQueue.length,
+      rRAtt:
+        rRQueue.reduce((sum, process) => sum + process.turnAroundTime, 0) /
+        [...new Set(rRQueue.map((process) => process.id))].length,
+      nPSJFAtt:
+        nPSJFQueue.reduce((sum, process) => sum + process.turnAroundTime, 0) /
+        nPSJFQueue.length,
     });
 
     currentClockTime++;
@@ -304,7 +322,7 @@ const populateQueues = (input, addLog) => {
 const initializeFIFOQueue = (queue) => {
   const fIFOQueue = [...queue];
 
-  fIFOQueue.sort(function (process1, process2) {
+  fIFOQueue.sort((process1, process2) => {
     return process1.clockTime - process2.clockTime;
   });
 
@@ -329,7 +347,7 @@ const initializeRRQueue = (queue) => {
   let tempQueue = [...queue];
   let rRQueue = [];
 
-  tempQueue.sort(function (process1, process2) {
+  tempQueue.sort((process1, process2) => {
     return process1.clockTime - process2.clockTime;
   });
 
@@ -387,7 +405,7 @@ const initializeRRQueue = (queue) => {
 const initializeNPSJFQueue = (queue) => {
   const nPSJFQueue = [...queue];
 
-  nPSJFQueue.sort(function (process1, process2) {
+  nPSJFQueue.sort((process1, process2) => {
     return process1.runningTime - process2.runningTime;
   });
 
@@ -438,60 +456,100 @@ const render = (clockCounter, queueLog, log) => {
   $("#npsjf-queue").empty();
   $("#log").empty();
 
-  queueLog
-    .find((element) => element.clockTime === clockCounter)
-    .fIFOQueue.forEach((process) => {
-      let rowStructure =
-        process.startTime <= clockCounter
-          ? "<tr class='table-success'>"
-          : "<tr>";
-      rowStructure += `<th class='text-center'>${process.id}</th>`;
-      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.startTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.endTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
-      rowStructure += "</tr>";
-      $("#fifo-queue").append(rowStructure);
-    });
+  const foundQueueLog = queueLog.find(
+    (element) => element.clockTime === clockCounter
+  );
 
-  queueLog
-    .find((element) => element.clockTime === clockCounter)
-    .rRQueue.forEach((process) => {
-      let rowStructure =
-        process.startTime <= clockCounter
-          ? "<tr class='table-success'>"
-          : "<tr>";
-      rowStructure += `<th class='text-center'>${process.id}</th>`;
-      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.index}</td>`;
-      rowStructure += `<td class='text-center'>${process.startTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.endTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
-      rowStructure += "</tr>";
-      $("#rr-queue").append(rowStructure);
-    });
+  foundQueueLog.fIFOQueue.forEach((process) => {
+    let rowStructure =
+      process.startTime <= clockCounter ? "<tr class='table-success'>" : "<tr>";
+    rowStructure += `<th class='text-center'>${process.id}</th>`;
+    rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.startTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.endTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
+    rowStructure += "</tr>";
+    $("#fifo-queue").append(rowStructure);
+  });
 
-  queueLog
-    .find((element) => element.clockTime === clockCounter)
-    .nPSJFQueue.forEach((process) => {
-      let rowStructure =
-        process.startTime <= clockCounter
-          ? "<tr class='table-success'>"
-          : "<tr>";
-      rowStructure += `<th class='text-center'>${process.id}</th>`;
-      rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.startTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.endTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
-      rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
-      rowStructure += "</tr>";
-      $("#npsjf-queue").append(rowStructure);
-    });
+  if (foundQueueLog.fIFOQueue.length > 0) {
+    $("#fifo-awt").text(
+      `Average waiting time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).fIFOAwt
+      }`
+    );
+    $("#fifo-att").text(
+      `Average turnaround time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).fIFOAtt
+      }`
+    );
+  } else {
+    $("#fifo-awt").empty();
+    $("#fifo-att").empty();
+  }
+
+  foundQueueLog.rRQueue.forEach((process) => {
+    let rowStructure =
+      process.startTime <= clockCounter ? "<tr class='table-success'>" : "<tr>";
+    rowStructure += `<th class='text-center'>${process.id}</th>`;
+    rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.index}</td>`;
+    rowStructure += `<td class='text-center'>${process.startTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.endTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
+    rowStructure += "</tr>";
+    $("#rr-queue").append(rowStructure);
+  });
+
+  if (foundQueueLog.rRQueue.length > 0) {
+    $("#rr-awt").text(
+      `Average waiting time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).rRAwt
+      }`
+    );
+    $("#rr-att").text(
+      `Average turnaround time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).rRAtt
+      }`
+    );
+  } else {
+    $("#rr-awt").empty();
+    $("#rr-att").empty();
+  }
+
+  foundQueueLog.nPSJFQueue.forEach((process) => {
+    let rowStructure =
+      process.startTime <= clockCounter ? "<tr class='table-success'>" : "<tr>";
+    rowStructure += `<th class='text-center'>${process.id}</th>`;
+    rowStructure += `<td class='text-center'>${process.runningTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.clockTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.startTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.endTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.waitingTime}</td>`;
+    rowStructure += `<td class='text-center'>${process.turnAroundTime}</td>`;
+    rowStructure += "</tr>";
+    $("#npsjf-queue").append(rowStructure);
+  });
+
+  if (foundQueueLog.nPSJFQueue.length > 0) {
+    $("#npsjf-awt").text(
+      `Average waiting time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).nPSJFAwt
+      }`
+    );
+    $("#npsjf-att").text(
+      `Average turnaround time: ${
+        queueLog.find((element) => element.clockTime === clockCounter).nPSJFAtt
+      }`
+    );
+  } else {
+    $("#npsjf-awt").empty();
+    $("#npsjf-att").empty();
+  }
 
   log
     .filter((element) => element.clockTime === clockCounter)
