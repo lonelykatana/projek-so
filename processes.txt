@@ -1,4 +1,4 @@
-Structure: id burst_time priority io_time clock_time
+Struktur: id waktu_burst prioritas waktu_io waktu_clock
 
 A 2 1 2 2
 B 5 2 5 3

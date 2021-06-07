@@ -18,7 +18,7 @@
     <script src="./index.js"></script>
     <title>Projek SO</title>
   </head>
-  <body>
+  <body style="padding-bottom: 240px">
     <div class="container-fluid">
       <div class="row">
         <div class="col">
@@ -34,9 +34,25 @@
             <br />
             Gessel Leon Bremana Sitepu (181401047)
             <br />
-            Rubenhard M H Lumbantobing (181401065)
+            Rubenhard M. H. Lumbantobing (181401065)
             <br />
             Erick Mutiha Nauli Gultom (181401128)
+          </p>
+          <p class="text-center">
+            Keterangan: <br />
+            Id = Process Id
+            <br />
+            RT = Running Time
+            <br />
+            CT = Clock Time
+            <br />
+            ST = Start Time
+            <br />
+            ET = End Time
+            <br />
+            WT = Waiting Time
+            <br />
+            TT = Turnaround Time
           </p>
         </div>
       </div>
@@ -56,7 +72,6 @@
           <button
             type="button"
             class="btn btn-primary"
-            onclick="prevClock()"
             id="prev-btn"
             disabled
             style="margin-right: 16px"
@@ -67,7 +82,6 @@
           <button
             type="button"
             class="btn btn-primary"
-            onclick="nextClock()"
             id="next-btn"
             style="margin-left: 16px"
             disabled
@@ -78,40 +92,52 @@
       </div>
       <div class="row">
         <div class="col">
-          <h3 class="text-center">FIFO</h3>
+          <h3 class="text-center">Qa <br />FIFO</h3>
           <table class="table">
             <thead>
               <tr>
                 <th scope="col" class="text-center">Id</th>
-                <th scope="col" class="text-center">Running Time</th>
-                <th scope="col" class="text-center">Clock Time</th>
+                <th scope="col" class="text-center">RT</th>
+                <th scope="col" class="text-center">CT</th>
+                <th scope="col" class="text-center">ST</th>
+                <th scope="col" class="text-center">ET</th>
+                <th scope="col" class="text-center">WT</th>
+                <th scope="col" class="text-center">TT</th>
               </tr>
             </thead>
             <tbody id="fifo-queue"></tbody>
           </table>
         </div>
         <div class="col">
-          <h3 class="text-center">Round Robin (RR)</h3>
+          <h3 class="text-center">Qb <br />Round Robin (RR)</h3>
           <table class="table">
             <thead>
               <tr>
                 <th scope="col" class="text-center">Id</th>
-                <th scope="col" class="text-center">Running Time</th>
-                <th scope="col" class="text-center">Clock Time</th>
-                <th scope="col" class="text-center">Index</th>
+                <th scope="col" class="text-center">RT</th>
+                <th scope="col" class="text-center">CT</th>
+                <th scope="col" class="text-center">Idx</th>
+                <th scope="col" class="text-center">ST</th>
+                <th scope="col" class="text-center">ET</th>
+                <th scope="col" class="text-center">WT</th>
+                <th scope="col" class="text-center">TT</th>
               </tr>
             </thead>
             <tbody id="rr-queue"></tbody>
           </table>
         </div>
         <div class="col">
-          <h3 class="text-center">Non-Preemtive SJF</h3>
+          <h3 class="text-center">Qc <br />Non-Preemtive SJF</h3>
           <table class="table">
             <thead>
               <tr>
                 <th scope="col" class="text-center">Id</th>
-                <th scope="col" class="text-center">Running Time</th>
-                <th scope="col" class="text-center">Clock Time</th>
+                <th scope="col" class="text-center">RT</th>
+                <th scope="col" class="text-center">CT</th>
+                <th scope="col" class="text-center">ST</th>
+                <th scope="col" class="text-center">ET</th>
+                <th scope="col" class="text-center">WT</th>
+                <th scope="col" class="text-center">TT</th>
               </tr>
             </thead>
             <tbody id="npsjf-queue"></tbody>
