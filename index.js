@@ -195,7 +195,7 @@ const main = (input) => {
 
           for (
             let index = 0;
-            index < Math.ceil(process.runningTime / 4);
+            index < Math.ceil(process.runningTime / QUANTUM_TIME);
             index++
           ) {
             const newRRProcess = {
@@ -268,6 +268,7 @@ const main = (input) => {
   }
 
   currentClockTime--;
+  console.log(queueLog);
   return { queueLog, currentClockTime, log };
 };
 
@@ -354,9 +355,13 @@ const initializeRRQueue = (queue) => {
   while (tempQueue.length !== 0) {
     rRQueue = rRQueue.concat(
       tempQueue.map((process) => {
-        const lastIndex =
-          rRQueue.reverse().find((element) => element.id === process.id)
-            ?.index || -1;
+        const foundElement = rRQueue
+          .reverse()
+          .find((element) => element.id === process.id);
+        let lastIndex = -1;
+        if (foundElement != null) {
+          lastIndex = foundElement.index;
+        }
 
         return {
           ...process,
@@ -437,7 +442,9 @@ const processQueue = (queue, currentClockTime, addLog) => {
     addLog({
       clockTime: currentClockTime,
       message: `Selesai memproses proses ${processedProcess.id} ${
-        processedProcess.index ? ` dengan indeks ${processedProcess.index}` : ""
+        processedProcess.index != null
+          ? ` dengan indeks ${processedProcess.index}`
+          : ""
       }`,
     });
   } else if (processedProcess.startTime <= currentClockTime) {
