@@ -268,7 +268,6 @@ const main = (input) => {
   }
 
   currentClockTime--;
-  console.log(queueLog);
   return { queueLog, currentClockTime, log };
 };
 
